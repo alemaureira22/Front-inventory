@@ -3,9 +3,10 @@ import { CategoryElement } from '../../category/components/category/category.com
 
 import { MatPaginator } from '@angular/material/paginator';
 import { ProductService } from '../../shared/services/product.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarRef, SimpleSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
+import { NewProductComponent } from '../new-product/new-product.component';
 
 @Component({
   selector: 'app-product',
@@ -54,8 +55,32 @@ export class ProductComponent implements OnInit {
     }
 
   }
+  openProductDialog(){
+    
+      const dialogRef = this.dialog.open(NewProductComponent , {
+        width: '450px'
+      });
+  
+      dialogRef.afterClosed().subscribe((result:any) => {
+        
+        if( result == 1){
+          this.openSnackBar("Producto Agregado", "Exitosa");
+          this.getProducts();
+        } else if (result == 2) {
+          this.openSnackBar("Se produjo un error al guardar producto", "Error");
+        }
+      });
+    }
+    openSnackBar(message: string, action: string) : MatSnackBarRef<SimpleSnackBar>{
+      return this.snackBar.open(message, action, {
+        duration: 2000
+      })
+  
+    }
+  
+  }
 
-}export interface ProductElement{
+export interface ProductElement{
   id: number;
   name: string;
   price: number;

@@ -1,12 +1,11 @@
 import { Component, inject, OnInit, ViewChild } from '@angular/core';
-import { CategoryElement } from '../../category/components/category/category.component';
-
 import { MatPaginator } from '@angular/material/paginator';
 import { ProductService } from '../../shared/services/product.service';
 import { MatSnackBar, MatSnackBarRef, SimpleSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { NewProductComponent } from '../new-product/new-product.component';
+import { ConfirmComponent } from '../../shared/components/confirm/confirm.component';
 
 @Component({
   selector: 'app-product',
@@ -42,9 +41,9 @@ export class ProductComponent implements OnInit {
   processProductResponse(resp: any){
     const dateProduct: ProductElement[] = [];
     if( resp.metadata[0].code == "00") {
-      let listProduct = resp.product.products
-      listProduct.forEach((element: ProductElement) => {
-      element.category = element.category.name;
+      let listCProduct = resp.product.products
+      listCProduct.forEach((element: ProductElement) => {
+      // element.category = element.category.name;
       element.picture = 'data:image/jpeg;base64,'+element.picture;
         dateProduct.push(element);
       });
@@ -77,6 +76,53 @@ export class ProductComponent implements OnInit {
       })
   
     }
+    edit(id:number, name:string, price:number, account:number, category:any){
+      const dialogRef = this.dialog.open(NewProductComponent , {
+        width: '450px',
+        data:{ id:id, name: name, price: price, account: account, category: category}
+      });
+  
+      dialogRef.afterClosed().subscribe((result:any) => {
+        
+        if( result == 1){
+          this.openSnackBar("Producto Edita", "Exitosa");
+          this.getProducts();
+        } else if (result == 2) {
+          this.openSnackBar("Se produjo un error al editar producto", "Error");
+        }
+      });
+
+    }
+  
+     delete(id: any){
+      const dialogRef = this.dialog.open(ConfirmComponent , {
+      width: '450px',
+      data: {id: id, module: "product"}
+    });
+ 
+      dialogRef.afterClosed().subscribe((result:any) => {
+     
+      if( result == 1){
+        this.openSnackBar("Producto eliminado", "Exitosa");
+        this.getProducts();
+      } else if (result == 2) {
+        this.openSnackBar("Se produjo un error al eliminar producto", "Error");
+      }
+    });
+  }
+ 
+  buscar(name: any){
+    if ( name.length === 0){
+      return this.getProducts();
+    }
+ 
+    this.productService.getProductByName(name)
+        .subscribe( (resp: any) =>{
+          this.processProductResponse(resp);
+        })
+  }
+ 
+ 
   
   }
 

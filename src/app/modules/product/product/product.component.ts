@@ -6,6 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { NewProductComponent } from '../new-product/new-product.component';
 import { ConfirmComponent } from '../../shared/components/confirm/confirm.component';
+import { UtilService } from '../../shared/services/util.service';
 
 @Component({
   selector: 'app-product',
@@ -13,14 +14,17 @@ import { ConfirmComponent } from '../../shared/components/confirm/confirm.compon
   styleUrls: ['./product.component.css']
 })
 export class ProductComponent implements OnInit {
+
+  isAdmin: any;
   
   private productService = inject(ProductService)
   private snackBar = inject(MatSnackBar)
   public dialog = inject(MatDialog)
-
+  public util = inject(UtilService)
 
   ngOnInit(): void {
     this.getProducts();
+    this.isAdmin = this.isAdmin
   }
   displayedColumns: string[] = ['id', 'name', 'price','account','category','picture','actions'];
   dataSource = new MatTableDataSource<ProductElement>();
